@@ -19,12 +19,13 @@ const myTable = document.querySelector('.myTable');
 const generateTable = (data) => {
     // console.log(Object.entries(data));
     Object.entries(data).sort().reverse().map((el) => {
-        console.log(el);
+        // console.log(el);
         myTable.insertAdjacentHTML('afterbegin', `
-    <tr>
+    <tr class='${el[0]} ${el[1].hide}' name='${el[0]}'>
         <th scope="row">#</th>
         <td>${el[0]}</td>
         <td><button class="item" name='${el[0]}'>Создать документ Word</button></td>
+        <td><button class="hidBtn" name='hide'>Спрятать</button></td>
     </tr>
     `)
         const item = document.querySelector('.item');
@@ -32,12 +33,24 @@ const generateTable = (data) => {
             // console.log('click', e.target.name);
             generate(e.target.name)
         })
+        const hidBtn = document.querySelector('.hidBtn');
+        hidBtn.addEventListener('click', (e) => {
+            // console.log('hide');
+            console.log('click', e.target.parentElement.parentElement.getAttribute('name'));
+            const row = e.target.parentElement.parentElement;
+            row.classList.add('hiden');
+
+            db.collection("admission").doc(e.target.parentElement.parentElement.getAttribute('name')).set({ hide: 'hiden' },
+                { merge: true }
+            )
+        })
     });
 
 };
 
 function getBase() {
     db.collection("admission").get().then((querySnapshot) => {
+
         querySnapshot.forEach(function (doc) {
             // doc.data() is never undefined for query doc snapshots
             // console.log(doc.id, " => ", doc.data());
@@ -50,6 +63,26 @@ function getBase() {
         // console.log('Валерия', base[Object.keys(base)[0]]);
         generateTable(base);
     })
+
+}
+
+// function hide(e) {
+//     // console.log('hide');
+//     console.log('click', e.target.parentElement.parentElement.className);
+//     // const row = e.target.parentElement.parentElement;
+//     // row.classList.add('hiden');
+
+//     // db.collection("admission").doc(`${item.lastName}.${item.firsName}.${item.yearBirth}`).set(item,
+//     //     { merge: true }
+//     //   )
+// }
+
+function showHiden() {
+
+    const trRow = document.querySelectorAll('tr')
+    trRow.forEach((el) => { el.classList.remove('hiden') });
+    console.log(trRow, 'show')
+
 }
 
 
